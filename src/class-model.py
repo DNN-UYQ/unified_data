@@ -1,4 +1,4 @@
-# Model Class to be used for different ML algorithms
+# Model Class to be used for all Preprossessing file
 class ClassifierModel(object):
     def __init__(self, clf, params=None):
         self.clf = clf(**params)

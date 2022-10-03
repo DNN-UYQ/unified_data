@@ -1,32 +1,9 @@
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from ilyes import id_name
-import numpy as np
-from sklearn.utils.class_weight import compute_sample_weight
+X_train_positive.append(X_list[random_id_positive[i]])
+X_list = np.delete(X_list, random_id_positive[i], axis=0)
+y_train.append(y_list[random_id_positive[i]])
+y_list = np.delete(y_list, random_id_positive[i])
+X_train_negative.append(X_list[random_id_negative[i]])
 
-
-class AdaBoostClassifierOptuna(AdaBoostClassifier):
-    def init_hyperparameters(self, trial, X, y):
-        self.name = id_name('AdaBoostClassifier_')
-        self.n_estimators = trial.suggest_int(self.name + "n_estimators", 50, 500, log=False)
-        self.learning_rate = trial.suggest_loguniform(self.name + "learning_rate", 0.01, 2)
-        self.algorithm = trial.suggest_categorical(self.name + "algorithm", ["SAMME.R", "SAMME"])
-        self.max_depth = trial.suggest_int(self.name + "max_depth", 1, 10, log=False)
-        self.base_estimator = DecisionTreeClassifier(max_depth=self.max_depth)
-        self.classes_ = np.unique(y.astype(int))
-
-    def generate_hyperparameters(self, space_gen, depending_node=None):
-        self.name = id_name('AdaBoostClassifier_')
-        space_gen.generate_number(self.name + "n_estimators", 50, depending_node=depending_node, low=50, high=500, is_float=False)
-        space_gen.generate_number(self.name + "learning_rate", 0.1, depending_node=depending_node, low=0.01, high=2, is_log=True)
-        space_gen.generate_cat(self.name + "algorithm", ["SAMME.R", "SAMME"], "SAMME.R", depending_node=depending_node)
-        space_gen.generate_number(self.name + "max_depth", 1, depending_node=depending_node, low=1, high=10, is_float=False)
-
-    def set_weight(self, custom_weight):
-        self.custom_weight = custom_weight
-
-    def fit(self, X, y=None, sample_weight=None):
-        if hasattr(self, 'custom_weight'):
-            return super().fit(X, y, sample_weight=compute_sample_weight(class_weight=self.custom_weight , y=y))
-        else:
-            return super().fit(X, y)
+X_list = np.delete(X_list, random_id_negative[i], axis=0)
+y_train.append(y_list[random_id_negative[i]])
+y_list = np.delete(y_list, random_id_negative[i])
