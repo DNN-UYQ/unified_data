@@ -1,10 +1,13 @@
 import openml
 import numpy as np
-from Clf_list import random_molde
-import pandas as pd
-from Numeric_transformer import transformer
-from Datasets_info import get_number_features, get_number_instance, f1_score_berechnen
-from sklearn.metrics import f1_score
+from sklearn.preprocessing import StandardScaler
+from Clf_list import classfier, params
+from sklearn.impute import SimpleImputer
+
+
+
+from Feature_reduction import feture_reduction_pca, feture_reduction_tsne
+from sklearn.metrics import accuracy_score
 
 
 
@@ -17,24 +20,24 @@ def data_download(data_id):
         dataset = openml.datasets.get_dataset(dataset_id=data_id[id])
         X, y, categorical_indicator, attribute_names = dataset.get_data(dataset_format="array",
                                                                         target=dataset.default_target_attribute)
-        preproceser= transformer(categorical_indicator)
-        X_transformer=preproceser.fit_transform(X, y)
-        """X_scaler = StandardScaler().fit_transform(X)
-
+        X_scaler = StandardScaler().fit_transform(X)
+        #X_tsne= feture_reduction_tsne(X_scaler)
         imp = SimpleImputer(missing_values=np.nan, strategy='mean')
         imp.fit(X_scaler)
         X_scaler = imp.transform(X_scaler)
-        min =np.amax(X_scaler)
-        print(min)"""
+        #print("xscaler {X_scaler.shape}", X_scaler)
+        #X_pca = feture_reduction_pca(X_scaler)
+        #print("xpca{X_pca.shape}", X_pca)
 
 
-        X_list.append(X_transformer)
+        X_list.append(X_scaler)
         y_list.append(y)
         """: type X_list, y_list: list """
     return X_list, y_list
-id=[31, 1464]
-X_list,y_list =data_download(id)
+data_id = [31, 1464]
 
+X_list, y_list = data_download(data_id)
+print(len(X_list))
 
 
 
@@ -52,61 +55,33 @@ def data_sampling(X_list, y_list):
         y_train.append(y_list[random_id_positive[i]])
         X_train_negative.append(X_list[random_id_negative[i]])
         y_train.append(y_list[random_id_negative[i]])
-
     X_train = np.concatenate([X_train_positive, X_train_negative], axis=0)
-    X_rest= X_list
-    y_rest=y_list
 
     return X_train, np.array(y_train)
 
 
 
 def unified_data(X_list, y_list):
-    clf_list=[]
-    name_clf=[]
-    for model in range(50):
-        name, clf = random_molde()
-        clf_list.append(clf)
-        name_clf.append(name)
-
+    clf_list = classfier()
     y_big = []
     X_big = []
     for i in range(len(X_list)):
         X_train, y_train = data_sampling(X_list[i], y_list[i])
         X_new = np.zeros((100, len(clf_list)))
         y_big.append(y_train[100:])
-        #score_list = np.zeros((len(clf_list),))
+        name, clf = generate_random_molde()
         for clf_i in range(len(clf_list)):
-
             clf_list[clf_i].fit(X_train[:100], y_train[:100])
             X_new[:, clf_i] = clf_list[clf_i].predict_proba(X_train[100:])[:, 0]
-            score = f1_score_berechnen(X_list[i], y_list[i], clf_list[clf_i])
-            X_new = np.insert(X_new, X_new.shape[1], values=score, axis=1)
-
-            #score = f1_score_berechnen(X_list[i], y_list[i], clf_list[clf_i])
-            #score_list=np.append(score)
-            #print(len(score_list))
-
-
-        number_features=get_number_features(X_list[i])
-        number_instances=get_number_instance(X_list[i])
-
-        X_new=np.insert(X_new, X_new.shape[1], values=number_features, axis=1)
-        X_new=np.insert(X_new, X_new.shape[1], values=number_instances, axis=1)
-
         X_big.append(X_new)
 
 
-    X_big = np.array(X_big).reshape((len(X_big) * 100, X_new.shape[1]))
+    X_big = np.array(X_big).reshape((len(X_big) * 100, 3))
     y_big = np.array(y_big).reshape((len(y_big)*100, ))
 
 
-    #name_clf.append("y")
-    #df =pd.DataFrame(data=np.column_stack((X_big,y_big)), columns=name_clf)
-
     return (X_big, y_big)
-X_big, y_big = unified_data(X_list, y_list)
-df=pd.DataFrame(X_big)
-df.to_excel("ilyes.xlsx")
 
 
+"""X_big, y_big = unified_data(X_list, y_list)
+print(X_big.shape)"""
