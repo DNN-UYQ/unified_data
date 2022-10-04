@@ -10,12 +10,13 @@ warnings.simplefilter(action='ignore')
 import pandas as pd
 from Openml_task import datasets_filter
 from sklearn.metrics import accuracy_score
+import numpy as np
 
 
 if __name__ == '__main__':
     data_id = [31, 1464]
     X_list, y_list = data_download(data_id)
-    X_big, y_big = unified_data(X_list, y_list)
+    X_big, y_big, column = unified_data(X_list, y_list)
     X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X_big, y_big, random_state=1)
     automl = autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=600, per_run_time_limit=10,
                                                               metric=f1)
@@ -25,8 +26,15 @@ if __name__ == '__main__':
     print(f"Accuracy score: {accuracy_score(y_test, predictions): 6.3f}")
     print("Accuracy score", sklearn.metrics.accuracy_score(y_test, predictions))
 
-    #r = permutation_importance(automl, X_big, y_big, n_repeats=10, random_state=0)
-    #sort_idx = r.importances_mean.argsort()[::-1]
+    result = permutation_importance(automl, X_train, y_train, n_repeats=10, random_state=0)
+    perm_sorted_idx = result.importances_mean.argsort()
+    print (len(result))
+    print (perm_sorted_idx)
+
+
+
+    """r = permutation_importance(automl, X_big, y_big, n_repeats=10, random_state=0)
+    sort_idx = r.importances_mean.argsort()[::-1]
 
 
 
@@ -36,11 +44,11 @@ if __name__ == '__main__':
 
 
 
-    """feature_selection = pd.DataFrame(r)
-    feature_selection.to_excel("features_selection_new.xlsx")"""
+    feature_selection = pd.DataFrame(r)
+    feature_selection.to_excel("features_selection_new.xlsx")
 
 
-    """plt.boxplot(r.importances[sort_idx].T,
+    plt.boxplot(r.importances[sort_idx].T,
                 labels=[X_big[i] for i in sort_idx])
 
     plt.xticks(rotation=90)

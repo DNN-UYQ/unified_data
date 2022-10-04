@@ -5,6 +5,7 @@ import pandas as pd
 from Numeric_transformer import transformer
 from Datasets_info import get_number_features, get_number_instance, f1_score_berechnen
 from sklearn.metrics import f1_score
+from openml.datasets import list_datasets
 
 
 
@@ -71,6 +72,7 @@ def unified_data(X_list, y_list):
 
     y_big = []
     X_big = []
+    column= clf_list+ clf_list
     for i in range(len(X_list)):
         X_train, y_train = data_sampling(X_list[i], y_list[i])
         X_new = np.zeros((100, len(clf_list)))
@@ -82,16 +84,11 @@ def unified_data(X_list, y_list):
             X_new[:, clf_i] = clf_list[clf_i].predict_proba(X_train[100:])[:, 0]
             score = f1_score_berechnen(X_list[i], y_list[i], clf_list[clf_i])
             X_new = np.insert(X_new, X_new.shape[1], values=score, axis=1)
-
-            #score = f1_score_berechnen(X_list[i], y_list[i], clf_list[clf_i])
-            #score_list=np.append(score)
-            #print(len(score_list))
-
-
         number_features=get_number_features(X_list[i])
         number_instances=get_number_instance(X_list[i])
 
         X_new=np.insert(X_new, X_new.shape[1], values=number_features, axis=1)
+
         X_new=np.insert(X_new, X_new.shape[1], values=number_instances, axis=1)
 
         X_big.append(X_new)
@@ -99,14 +96,12 @@ def unified_data(X_list, y_list):
 
     X_big = np.array(X_big).reshape((len(X_big) * 100, X_new.shape[1]))
     y_big = np.array(y_big).reshape((len(y_big)*100, ))
+    column.append("number_features")
+    column.append("number_instances")
+
+    return (X_big, y_big, column)
 
 
-    #name_clf.append("y")
-    #df =pd.DataFrame(data=np.column_stack((X_big,y_big)), columns=name_clf)
 
-    return (X_big, y_big)
-X_big, y_big = unified_data(X_list, y_list)
-df=pd.DataFrame(X_big)
-df.to_excel("ilyes.xlsx")
 
 
