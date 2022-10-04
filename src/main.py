@@ -8,6 +8,9 @@ from Best_models import best_models
 import warnings
 warnings.simplefilter(action='ignore')
 import pandas as pd
+from Openml_task import datasets_filter
+from sklearn.metrics import accuracy_score
+
 
 if __name__ == '__main__':
     data_id = [31, 1464]
@@ -17,20 +20,27 @@ if __name__ == '__main__':
     automl = autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=600, per_run_time_limit=10,
                                                               metric=f1)
     automl.fit(X_train, y_train)
+    predictions = automl.predict(X_test)
+    print("f1 score", sklearn.metrics.f1_score(y_test, predictions))
+    print(f"Accuracy score: {accuracy_score(y_test, predictions): 6.3f}")
+    print("Accuracy score", sklearn.metrics.accuracy_score(y_test, predictions))
+
+    #r = permutation_importance(automl, X_big, y_big, n_repeats=10, random_state=0)
+    #sort_idx = r.importances_mean.argsort()[::-1]
 
 
-    r = permutation_importance(automl, X_big, y_big, n_repeats=10, random_state=0)
-    sort_idx = r.importances_mean.argsort()[::-1]
 
 
-    print("rrrrrrrrrr",r)
+
+
+
 
 
     """feature_selection = pd.DataFrame(r)
     feature_selection.to_excel("features_selection_new.xlsx")"""
 
 
-    plt.boxplot(r.importances[sort_idx].T,
+    """plt.boxplot(r.importances[sort_idx].T,
                 labels=[X_big[i] for i in sort_idx])
 
     plt.xticks(rotation=90)
@@ -39,5 +49,5 @@ if __name__ == '__main__':
 
     for i in sort_idx[::-1]:
         print(f"{X_test[i]:10s}: {r.importances_mean[i]:.3f} +/- "
-              f"{r.importances_std[i]:.3f}")
+              f"{r.importances_std[i]:.3f}")"""
 

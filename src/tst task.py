@@ -6,10 +6,10 @@ from openml.datasets import list_datasets
 
 
 
-
+my_openml_tasks=[75126, 75125, 75121]
 from openml.datasets import edit_dataset, fork_dataset, get_dataset
 
-my_openml_tasks = [75126, 75125, 75121, 75120, 75116, 75115, 75114, 189859, 189878,
+"""my_openml_tasks = [75126, 75125, 75121, 75120, 75116, 75115, 75114, 189859, 189878,
 189786, 167204, 190156, 75156, 166996, 190157, 190158, 168791, 146597, 167203, 167085,
 190154, 75098, 190159, 75169, 126030, 146594, 211723, 189864, 189863, 189858, 75236,
 190155, 211720, 167202, 75108, 146679, 146592, 166866, 167205, 2356, 75225, 146576,
@@ -26,27 +26,44 @@ my_openml_tasks = [75126, 75125, 75121, 75120, 75116, 75115, 75114, 189859, 1898
 126028, 3055, 75148, 75223, 3054, 167103, 75173, 166882, 3048, 3053, 2122, 75163, 167105,
 75131, 126024, 75192, 75213, 146575, 166931, 166957, 166956, 75250, 146577, 146586,
 166959, 75210, 241, 166958, 189902, 75237, 189846, 75157, 189893, 189890, 189887,
-189884, 189883, 189882, 189881, 189880, 167099, 189894]
+189884, 189883, 189882, 189881, 189880, 167099, 189894]"""
 yes=[]
 no =[]
+dataset_id=[]
 for task_id in my_openml_tasks:
     task = openml.tasks.get_task(task_id)
     data_id = task.get_dataset().dataset_id
-    #print (data_id)
+    print(data_id)
+    print(list_datasets(data_id=[data_id]))
     number_class=list(list_datasets(data_id=[data_id]).values())[0]["NumberOfClasses"]
     if number_class == 2:
+        dataset_id.append(data_id)
+
+
+
+    """number_class=list(list_datasets(data_id=[data_id]).values())[0]["NumberOfClasses"]
+    majority_Class_size = list(list_datasets(data_id=[data_id]).values())[0]["MajorityClassSize"]
+    max_nominal_att_distinct_values = list(list_datasets(data_id=[data_id]).values())[0]["MaxNominalAttDistinctValues"]
+    minority_class_size = list(list_datasets(data_id=[data_id]).values())[0]["MinorityClassSize"]
+    number_features = list(list_datasets(data_id=[data_id]).values())[0]["NumberOfFeatures"]
+    print(max_nominal_att_distinct_values, number_features, number_class, minority_class_size)
+    print(openml.datasets.list_qualities())
+    a= openml.tasks.get_task(task_id)"""
+
+
+    """if number_class == 2:
         print("yess", data_id)
         yes.append(data_id)
     else:
         print("noooo",data_id)
-        no.append(data_id)
+        no.append(data_id)"""
 
-print ("no",len(no))
+"""print ("no",len(no))
 print("yes",len(yes))
 uni_no=np.unique(no)
 uni_yes=np.unique(yes)
 print ("unino",len(uni_no))
-print("uniyes",len(uni_yes))
+print("uniyes",len(uni_yes))"""
 
 
 
@@ -54,14 +71,7 @@ print("uniyes",len(uni_yes))
 
 
 
-"""a=list_datasets(data_id=[data_id])
-    b=list(a.values())[0]
-    print(type(b))
-    c= (b["NumberOfClasses"])
-    if c == 2:
-        print("yess",c)
-    elif c != 2:
-        print("nooo", c)"""
+
 
 
 

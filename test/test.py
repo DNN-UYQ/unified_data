@@ -1,4 +1,4 @@
-from Preprocessing import data_download, unified_data, data_sampling
+"""from Preprocessing import data_download, unified_data, data_sampling
 
 data_id = [31, 1464]
 X_list, y_list = data_download(data_id)
@@ -8,4 +8,9 @@ X_big, y_big = unified_data(X_list, y_list)
 print("xbig", X_big)
 print("y_big", y_big)
 #print(X_big)
-#print(y_big)
+#print(y_big)"""
+
+import pyautoweka
+
+experiment = pyautoweka.ClassificationExperiment(tuner_timeout=360)
+#print(pyautoweka.AVAILABLE_CLASSIFIERS)
